@@ -37,7 +37,7 @@ func HasUser(key string) error {
 	}
 	if n <= 0 {
 		return nil
-	}else {
+	} else {
 		return errors.New("账号重复")
 	}
 }
