@@ -9,9 +9,9 @@ import (
 func AiRequest(r *gin.Engine) {
 	aiTextHelper := r.Group("aiTextHelper")
 	aiTextHelper.Use(middleware.JWTAuthMiddleware())
+	aiTextHelper.Use(middleware.ArnMiddleware())
 	{
-		aiTextHelper.GET("/authentication", handler.Authentication)
-		aiTextHelper.POST("/translate", handler.Translate)
-		aiTextHelper.POST("/polish", handler.Polish)
+		aiTextHelper.POST("/textDeal", handler.TextDeal)
+		aiTextHelper.POST("/customize", handler.Customize)
 	}
 }

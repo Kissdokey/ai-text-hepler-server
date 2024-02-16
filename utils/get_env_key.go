@@ -37,3 +37,32 @@ func GetEnvSQL() (string, error) {
 		return sqlPassword, nil
 	}
 }
+func GetEnvApiKey() (string,error) {
+	// 获取密钥
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		fmt.Println("无法获取api-key，请配置环境变量：API_KEY")
+		return apiKey, errors.New("无法获取api-key，请配置环境变量：API_KEY")
+	} else {
+		return apiKey, nil
+	}
+}
+func GetEnvSecretKey() (string,error) {
+	// 获取密钥
+	secretKey := os.Getenv("SECRET_KEY")
+	if secretKey == "" {
+		fmt.Println("无法获取secret-key，请配置环境变量：SECRET_KEY")
+		return secretKey, errors.New("无法获取secret-key，请配置环境变量：SECRET_KEY")
+	} else {
+		return secretKey, nil
+	}
+}
+func GetEnvAccessToken() (string,error) {
+	accessToken := os.Getenv("ACCESS_TOKEN")
+	if accessToken == "" {
+		fmt.Println("无法获取access-token，请配置环境变量：ACCESS_TOKEN")
+		return accessToken, errors.New("无法获取secret-key，请配置环境变量：ACCESS_TOKEN")
+	} else {
+		return accessToken, nil
+	}
+}

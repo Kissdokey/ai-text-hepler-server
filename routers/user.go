@@ -11,6 +11,7 @@ func UserInfo(r *gin.Engine) {
 	userInfo := r.Group("userInfo")
 	userInfo.Use(middleware.JWTAuthMiddleware())
 	{
+		userInfo.GET("/authentication", handler.Authentication)
 		userInfo.POST("/updateAvatar", handler.UpdateAvatar)
 	}
 }

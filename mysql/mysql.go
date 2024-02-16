@@ -223,26 +223,26 @@ func UpdateAvatar(avatar string, username string) error {
 	}
 	return nil
 }
-func UpdateRequestNumber(username string, deltaNum int) error {
-	selectCommand := "select apiRequestNumber from user_info_table where username = " + username + ";"
-	numRows, selectErr := SqlDb.Query(selectCommand)
+func UpdateRequestNumber(username string, deltaNum int) (int,error) {
+	selectCommand := "select apiRequestNumber from user_info_table where username = ?;"
+	numRows := SqlDb.QueryRow(selectCommand,username)
+	var num int
+	selectErr := numRows.Scan(&num)
 	if selectErr != nil {
 		fmt.Println(selectErr)
-		return selectErr
+		return 0,selectErr
 	}
-	var num int
-	numRows.Scan(&num)
 	num += deltaNum
 	if num < 0 {
 		num = 0
 	}
-	command := fmt.Sprintf("update %s set apiRequestNumber = %d where username = %s;", "user_info_table", num, username)
+	command := fmt.Sprintf("update %s set apiRequestNumber = %d where username = '%s';", "user_info_table", num, username)
 	_, err := SqlDb.Exec(command)
 	if err != nil {
 		fmt.Println(err)
-		return err
+		return 0,err
 	}
-	return nil
+	return num,nil
 }
 
 func GetUserInfo(username string) (SQLData, error) {

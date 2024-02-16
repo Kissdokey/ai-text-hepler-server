@@ -1,11 +1,15 @@
 package main
 
-import "github.com/gin-contrib/cors"
-import "github.com/gin-gonic/gin"
-import "ai-text-helper-server/routers"
-import "ai-text-helper-server/redis"
-import "ai-text-helper-server/mysql"
-import "time"
+import (
+	"ai-text-helper-server/ai_request"
+	"ai-text-helper-server/mysql"
+	"ai-text-helper-server/redis"
+	"ai-text-helper-server/routers"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+)
 
 // import "ai-text-helper-server/eventHandler"
 // import "ai-text-helper-server/utils"
@@ -26,6 +30,9 @@ func main() {
 	routers.InitRouters(r)
 	//初始化redis
 	redis.InitRedis()
+	//初始化mysql
 	mysql.InitMySQL()
+	//
+	ai.InitAccessToken()
 	r.Run(":8000")
 }
