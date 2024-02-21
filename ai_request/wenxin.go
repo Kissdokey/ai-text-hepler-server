@@ -15,14 +15,19 @@ type AiRequestStruct struct {
 	Payload string `json:"payload"`
 }
 
+type CustomizeRequestStruct struct {
+	System         string `json:"system"`
+	RequestContent string `json:"requestContent"`
+}
 var urlMap = map[string]string{
-	"translate": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_speed?access_token=",
-    "completion": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_speed?access_token=",
-
+	"translate":  "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_speed?access_token=",
+	"completion": "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_speed?access_token=",
+	"customize":  "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions_pro?access_token=",
 }
 var payloadMap = map[string]string{
-	"translate": `{"messages":[{"role":"user","content":"请将「%s」进行翻译"}],"temperature":1,"system":"你是一个中英翻译助手，我将给你一段英文或者中文。如果我给你英文，请将之翻译为中文，反之则翻译为英文。"}`,
-    "completion":`{"messages":[{"role":"user","content":"请为「%s」进行续写"}],"temperature":1,"system":"你是一个文本续写助手，我将给你一段文本。你需要帮我进行续写，要求符合上下文语意"}`,
+	"translate":  `{"messages":[{"role":"user","content":"请将「%s」进行翻译"}],"temperature":1,"system":"你是一个中英翻译助手，我将给你一段英文或者中文。如果我给你英文，请将之翻译为中文，反之则翻译为英文。"}`,
+	"completion": `{"messages":[{"role":"user","content":"请为「%s」进行续写"}],"temperature":1,"system":"你是一个文本续写助手，我将给你一段文本。你需要帮我进行续写，要求符合上下文语意"}`,
+	"customize":  `{"messages":[{"role":"user","content":"%s"}],"system":"%s"}`,
 }
 
 /**
@@ -54,6 +59,7 @@ func InitAccessToken() {
 	accessTokenObj := map[string]string{}
 	json.Unmarshal([]byte(body), &accessTokenObj)
 	err = utils.SetEnv("ACCESS_TOKEN", accessTokenObj["access_token"])
+	fmt.Println(accessTokenObj["access_token"])
 	if err != nil {
 		return
 	}
@@ -63,27 +69,32 @@ func GenerateParameter(requestType, content string) (AiRequestStruct, error) {
 	if err != nil {
 		return AiRequestStruct{}, err
 	}
-    arcUrl,ok := urlMap[requestType]
-    if !ok {
-        return AiRequestStruct{},errors.New("请求类型错误！")
-    }
-    arcPayload,ok := payloadMap[requestType]
-    if !ok {
-        return AiRequestStruct{},errors.New("请求类型错误！")
-    }
+	arcUrl, ok := urlMap[requestType]
+	if !ok {
+		return AiRequestStruct{}, errors.New("请求类型错误！")
+	}
+	arcPayload, ok := payloadMap[requestType]
+	if !ok {
+		return AiRequestStruct{}, errors.New("请求类型错误！")
+	}
 	var ars = AiRequestStruct{
-		Url:    arcUrl  + accessToken,
+		Url:     arcUrl + accessToken,
 		Payload: fmt.Sprintf(arcPayload, content),
 	}
 	return ars, nil
 }
-
-func AiRequest(requestType, content string) (map[string]interface{}, error) {
-    ars,err := GenerateParameter(requestType,content)
-    if err != nil {
-        fmt.Println(err)
-        return nil,err
-    }
+func GenerateCustomizeParameter(requestStruct CustomizeRequestStruct) (AiRequestStruct, error) {
+	accessToken, err := utils.GetEnvAccessToken()
+	if err != nil {
+		return AiRequestStruct{}, err
+	}
+	var ars = AiRequestStruct{
+		Url:     urlMap["customize"] + accessToken,
+		Payload: fmt.Sprintf(payloadMap["customize"], requestStruct.RequestContent, requestStruct.System),
+	}
+	return ars, nil
+}
+func fetch(ars AiRequestStruct) (map[string]interface{}, error) {
 	url := ars.Url
 	payload := strings.NewReader(ars.Payload)
 	client := &http.Client{}
@@ -101,12 +112,28 @@ func AiRequest(requestType, content string) (map[string]interface{}, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
-    var result map[string]interface{}
+	var result map[string]interface{}
 	body, err := io.ReadAll(res.Body)
 	if err == nil {
 		json.Unmarshal([]byte(string(body)), &result)
 	}
 	return result, nil
 }
-
-
+func AiRequest(requestType, content string) (map[string]interface{}, error) {
+	ars, err := GenerateParameter(requestType, content)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	res, err := fetch(ars)
+	return res, err
+}
+func CustomizeAiRequest(requestStruct CustomizeRequestStruct) (map[string]interface{}, error) {
+	ars, err := GenerateCustomizeParameter(requestStruct)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	res, err := fetch(ars)
+	return res, err
+}
