@@ -17,32 +17,63 @@ import (
 
 // 传入表参数
 type SQLData struct {
-	Username         string `json:"username"`
-	Avatar           string `json:"avatar"`
-	ApiRequestNumber int    `json:"apiRequestNumber"`
+	Username            string `json:"username"`
+	Avatar              string `json:"avatar"`
+	ApiRequestNumber    int    `json:"apiRequestNumber"`
+	DirectoryDependence string `json:"directoryDependence"`
+	FileId              string `json:"fileId"`
+	Author              string `json:"author"`
+	FileName            string `json:"fileName"`
+	Content             string `json:"content"`
+	Comments            string `json:"comments"`
+	LastModifiedTime    string `json:"lastModifiedTime"`
+	CreateTime          string `json:"createTime"`
+	Permissions         int    `json:"permissions"`
+	IsDelete            bool   `json:"isDelete"`
+}
+
+type QuerryStruct struct {
+	IsDelete bool `json:"isDelete"`
+}
+type FileStruct struct {
 	FileId           string `json:"fileId"`
-	Belongs          string `json:"belongs"`
+	Author           string `json:"author"`
+	FileName         string `json:"fileName"`
 	Content          string `json:"content"`
 	Comments         string `json:"comments"`
 	LastModifiedTime string `json:"lastModifiedTime"`
+	CreateTime       string `json:"createTime"`
+	Permissions      int    `json:"permissions"`
+}
+
+type UserStruct struct {
+	Username            string `json:"username"`
+	Avatar              string `json:"avatar"`
+	ApiRequestNumber    int    `json:"apiRequestNumber"`
+	DirectoryDependence string `json:"directoryDependence"`
 }
 
 // 字段约束描述map
 var fieldDescription = map[string]string{
-	"username":         " varchar(64) NOT NULL",
-	"avatar":           " longtext ",
-	"apiRequestNumber": " int(4) NOT NULL DEFAULT 10",
-	"fileId":           " varchar(64) NOT NULL",
-	"belongs":          " varchar(64) NOT NULL  DEFAULT ''",
-	"content":          " longtext ",
-	"comments":         " longtext ",
-	"lastModifiedTime": " date",
+	"username":            " varchar(64) NOT NULL",
+	"avatar":              " longtext ",
+	"apiRequestNumber":    " int(4) NOT NULL DEFAULT 10",
+	"directoryDependence": " longtext ",
+	"fileId":              " varchar(64) NOT NULL",
+	"author":              " varchar(64) NOT NULL  DEFAULT ''",
+	"fileName":            " varchar(64)   DEFAULT ''",
+	"content":             " longtext ",
+	"comments":            " longtext ",
+	"lastModifiedTime":    " varchar(64) NOT NULL  DEFAULT ''",
+	"createTime":          "varchar(64) NOT NULL  DEFAULT ''",
+	"permissions":         "int(1) NOT NULL DEFAULT 0",
 }
 
 // 每个表字段map
 var tables = map[string][]string{
-	"user_info_table": {"username", "avatar", "apiRequestNumber"},
-	"file_table":      {"fileId", "belongs", "content", "comments", "lastModifiedTime"},
+	"user_info_table": {"username", "avatar", "apiRequestNumber", "directoryDependence"},
+	"file_table":      {"fileId", "fileName", "author", "content", "comments", "lastModifiedTime", "createTime", "permissions"},
+	"user_file_table": {"username", "fileId"},
 }
 
 // 创建表指令集map
@@ -202,12 +233,34 @@ func InsertRecord(data SQLData, table string) error {
 }
 
 func UpdateFile(data SQLData, fileId string) error {
-	deleteCommand := "delete  from file_table where fileId = " + fileId + ";"
+	deleteCommand := "delete  from file_table where fileId = '" + fileId + "';"
 	_, err := SqlDb.Exec(deleteCommand)
 	if err != nil {
 		fmt.Println(err)
 	}
 	insertErr := InsertRecord(data, "file_table")
+	if insertErr != nil {
+		fmt.Println(insertErr)
+		return insertErr
+	}
+	return nil
+}
+
+// 用户新建或者删除文件，需要，在user——file表中更新记录，并且在file表中更新数据或者删除数据
+func UpdateUserFile(username string, fileId string, isDelete bool) error {
+	if isDelete {
+		deleteCommand := "delete  from user_file_table where username = '" + username + "' and fileId =  '" + fileId + "' ;"
+		_, err := SqlDb.Exec(deleteCommand)
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
+		return nil
+	}
+	var data = SQLData{}
+	data.Username = username
+	data.FileId = fileId
+	insertErr := InsertRecord(data, "user_file_table")
 	if insertErr != nil {
 		fmt.Println(insertErr)
 		return insertErr
@@ -223,14 +276,14 @@ func UpdateAvatar(avatar string, username string) error {
 	}
 	return nil
 }
-func UpdateRequestNumber(username string, deltaNum int) (int,error) {
+func UpdateRequestNumber(username string, deltaNum int) (int, error) {
 	selectCommand := "select apiRequestNumber from user_info_table where username = ?;"
-	numRows := SqlDb.QueryRow(selectCommand,username)
+	numRows := SqlDb.QueryRow(selectCommand, username)
 	var num int
 	selectErr := numRows.Scan(&num)
 	if selectErr != nil {
 		fmt.Println(selectErr)
-		return 0,selectErr
+		return 0, selectErr
 	}
 	num += deltaNum
 	if num < 0 {
@@ -240,22 +293,51 @@ func UpdateRequestNumber(username string, deltaNum int) (int,error) {
 	_, err := SqlDb.Exec(command)
 	if err != nil {
 		fmt.Println(err)
-		return 0,err
+		return 0, err
 	}
-	return num,nil
+	return num, nil
+}
+func UpdateDirectoryDependence(username string, dependence string) error {
+	command := fmt.Sprintf("update user_info_table set directoryDependence = '%s' where username = '%s';", dependence, username)
+	_, err := SqlDb.Exec(command)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	return nil
 }
 
-func GetUserInfo(username string) (SQLData, error) {
+func GetUserInfo(username string) (UserStruct, error) {
 	command := "select avatar,apiRequestNumber from user_info_table where username = ?"
-	infoRows := SqlDb.QueryRow(command,username)
+	infoRows := SqlDb.QueryRow(command, username)
 	var (
 		avatar           string
 		apiRequestNumber int
 	)
-	err :=infoRows.Scan(&avatar, &apiRequestNumber)
+	err := infoRows.Scan(&avatar, &apiRequestNumber)
 	if err != nil {
 		fmt.Println(err)
-		return SQLData{}, err
+		return UserStruct{}, err
 	}
-	return SQLData{Avatar: avatar, ApiRequestNumber: apiRequestNumber},nil
+	return UserStruct{Avatar: avatar, ApiRequestNumber: apiRequestNumber}, nil
+}
+
+func GetFileInfo(fileId string) (FileStruct, error) {
+	command := "select author,fileName,content,comments,lastModifiedTime,createTime,permissions from file_table where fileId = ?"
+	infoRows := SqlDb.QueryRow(command, fileId)
+	var (
+		author           string
+		fileName         string
+		content          string
+		comments         string
+		lastModifiedTime string
+		createTime       string
+		permissions      int
+	)
+	err := infoRows.Scan(&author, &fileName, &content, &comments, &lastModifiedTime, &createTime, &permissions)
+	if err != nil {
+		fmt.Println(err)
+		return FileStruct{}, err
+	}
+	return FileStruct{Author: author, FileName: fileName, Content: content, Comments: comments, LastModifiedTime: lastModifiedTime, CreateTime: createTime, Permissions: permissions}, nil
 }

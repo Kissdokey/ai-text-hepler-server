@@ -13,6 +13,9 @@ func UserInfo(r *gin.Engine) {
 	{
 		userInfo.GET("/authentication", handler.Authentication)
 		userInfo.POST("/updateAvatar", handler.UpdateAvatar)
+		userInfo.POST("/updateDirectoryDependence",handler.UpdateDirectoryDependence)
+		userInfo.POST("/updateUserFile",handler.UpdateUserFile)
+		userInfo.POST("/updateFile",handler.UpdateFile)
 	}
 }
 

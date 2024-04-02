@@ -1,0 +1,61 @@
+Date : 2024-03-05 16:42:03
+Directory : e:\ai-text-helper-server
+Total : 24 files,  1137 codes, 54 comments, 107 blanks, all 1298 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| Go               |         20 |        968 |         54 |        101 |      1,123 |
+| Go Checksum File |          1 |        111 |          0 |          1 |        112 |
+| Go Module File   |          1 |         40 |          0 |          5 |         45 |
+| Markdown         |          1 |         17 |          0 |          0 |         17 |
+| JSON             |          1 |          1 |          0 |          0 |          1 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                       | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                          |         24 |      1,137 |         54 |        107 |      1,298 |
+| . (Files)                                                  |          4 |        195 |          7 |         11 |        213 |
+| ai_request                                                 |          1 |        129 |          4 |          7 |        140 |
+| eventHandler                                               |          4 |        230 |         10 |         17 |        257 |
+| middleware                                                 |          2 |         69 |          2 |          6 |         77 |
+| mysql                                                      |          1 |        221 |         21 |         20 |        262 |
+| redis                                                      |          1 |         59 |          1 |          5 |         65 |
+| routers                                                    |          4 |         46 |          0 |         14 |         60 |
+| userInfo                                                   |          1 |          1 |          0 |          0 |          1 |
+| utils                                                      |          6 |        187 |          9 |         27 |        223 |
++------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                                   | language         | code       | comment    | blank      | total      |
++------------------------------------------------------------+------------------+------------+------------+------------+------------+
+| e:\ai-text-helper-server\README.md                         | Markdown         |         17 |          0 |          0 |         17 |
+| e:\ai-text-helper-server\ai_request\wenxin.go              | Go               |        129 |          4 |          7 |        140 |
+| e:\ai-text-helper-server\eventHandler\ai_api.go            | Go               |        104 |          3 |          5 |        112 |
+| e:\ai-text-helper-server\eventHandler\login_handler.go     | Go               |         50 |          4 |          5 |         59 |
+| e:\ai-text-helper-server\eventHandler\register_handler.go  | Go               |         44 |          2 |          3 |         49 |
+| e:\ai-text-helper-server\eventHandler\user_info_handler.go | Go               |         32 |          1 |          4 |         37 |
+| e:\ai-text-helper-server\go.mod                            | Go Module File   |         40 |          0 |          5 |         45 |
+| e:\ai-text-helper-server\go.sum                            | Go Checksum File |        111 |          0 |          1 |        112 |
+| e:\ai-text-helper-server\main.go                           | Go               |         27 |          7 |          5 |         39 |
+| e:\ai-text-helper-server\middleware\api_request_numbers.go | Go               |         29 |          0 |          3 |         32 |
+| e:\ai-text-helper-server\middleware\jwt.go                 | Go               |         40 |          2 |          3 |         45 |
+| e:\ai-text-helper-server\mysql\mysql.go                    | Go               |        221 |         21 |         20 |        262 |
+| e:\ai-text-helper-server\redis\redis.go                    | Go               |         59 |          1 |          5 |         65 |
+| e:\ai-text-helper-server\routers\ai.go                     | Go               |         15 |          0 |          3 |         18 |
+| e:\ai-text-helper-server\routers\init.go                   | Go               |          7 |          0 |          3 |         10 |
+| e:\ai-text-helper-server\routers\login.go                  | Go               |         10 |          0 |          3 |         13 |
+| e:\ai-text-helper-server\routers\user.go                   | Go               |         14 |          0 |          5 |         19 |
+| e:\ai-text-helper-server\userInfo\example.json             | JSON             |          1 |          0 |          0 |          1 |
+| e:\ai-text-helper-server\utils\get_env_key.go              | Go               |         60 |          5 |          3 |         68 |
+| e:\ai-text-helper-server\utils\jwt.go                      | Go               |         53 |          0 |          6 |         59 |
+| e:\ai-text-helper-server\utils\md5v.go                     | Go               |         22 |          0 |          4 |         26 |
+| e:\ai-text-helper-server\utils\set_env_key.go              | Go               |         13 |          0 |          3 |         16 |
+| e:\ai-text-helper-server\utils\verification.go             | Go               |          3 |          1 |          2 |          6 |
+| e:\ai-text-helper-server\utils\write_json.go               | Go               |         36 |          3 |          9 |         48 |
+| Total                                                      |                  |      1,137 |         54 |        107 |      1,298 |
++------------------------------------------------------------+------------------+------------+------------+------------+------------+
