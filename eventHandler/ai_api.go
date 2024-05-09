@@ -2,9 +2,10 @@ package handler
 
 import (
 	"ai-text-helper-server/ai_request"
+	"ai-text-helper-server/filePermission"
 	"ai-text-helper-server/mysql"
-	"github.com/gin-gonic/gin"
 	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
 type RequestStruct struct {
@@ -53,7 +54,7 @@ func TextDeal(c *gin.Context) {
 	}
 }
 func Customize(c *gin.Context) {
-	var requestStruct ai.CustomizeRequestStruct
+	var requestStruct ai.GeneralRequestStruct
 	if err := c.BindJSON(&requestStruct); err == nil {
 		res, resErr := ai.CustomizeAiRequest(requestStruct)
 		if resErr != nil {
@@ -108,4 +109,35 @@ func Authentication(c *gin.Context) {
 			"apiRequestNumber": data.ApiRequestNumber,
 		},
 	})
+}
+
+func Chat(c *gin.Context) {
+	var requestStruct ai.ChatRequestStruct
+	username, _ := c.Get("username")
+	if err := c.BindJSON(&requestStruct); err == nil {
+		canIVisible, visibleErr := filePermission.CanISee(username.(string), requestStruct.FileId)
+		if visibleErr != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code": 501,
+				"msg":  "内部错误，文件获取失败",
+				"data": gin.H{},
+			})
+			return
+		}
+		if !canIVisible {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"code": 401,
+				"msg":  "当前文档您没有查看权限",
+				"data": gin.H{},
+			})
+			return
+		}
+		ai.Chat(requestStruct,c)
+	} else {
+		c.JSON(http.StatusNotAcceptable, gin.H{
+			"code": 406,
+			"msg":  "参数错误，请按照文档请求参数",
+			"data": gin.H{},
+		})
+	}
 }

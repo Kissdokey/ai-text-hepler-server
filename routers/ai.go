@@ -13,5 +13,6 @@ func AiRequest(r *gin.Engine) {
 	{
 		aiTextHelper.POST("/textDeal", handler.TextDeal)
 		aiTextHelper.POST("/customize", handler.Customize)
+		aiTextHelper.POST("/chat", handler.Chat)
 	}
 }

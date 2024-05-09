@@ -29,7 +29,7 @@ func RegisterHandler(c *gin.Context) {
 				mysql.InsertRecord(mysql.SQLData{
 					Username:         login.User,
 					Avatar:           "",
-					ApiRequestNumber: 10,
+					ApiRequestNumber: 100,
 				}, "user_info_table")
 				c.JSON(http.StatusOK, gin.H{
 					"code": 200,
