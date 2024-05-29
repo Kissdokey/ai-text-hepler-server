@@ -6,7 +6,7 @@ import (
 	"ai-text-helper-server/redis"
 	"ai-text-helper-server/routers"
 	"time"
-
+	"ai-text-helper-server/vectorDatabase"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +32,8 @@ func main() {
 	redis.InitRedis()
 	//初始化mysql
 	mysql.InitMySQL()
-	//
+	//初始化vectorDatabase
+	vector.Init()
 	ai.InitAccessToken()
 	r.Run(":8000")
 }
